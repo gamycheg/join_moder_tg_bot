@@ -104,13 +104,13 @@ class ChannelModerator {
     
     private function handleMessage($message) {
         if (isset($message['new_chat_members'])) {
-            $this->deleteServiceMessage($message['chat']['id'], $message['message_id']);
+            $this->deleteServiceMessage($message['message_id']);
             return;
         }
 
         // Обработка вышедших участников (приходит в message.left_chat_member)
         if (isset($message['left_chat_member'])) {
-            $this->deleteServiceMessage($message['chat']['id'], $message['message_id']);
+            $this->deleteServiceMessage($message['message_id']);
             return;
         }
         
