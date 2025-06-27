@@ -369,6 +369,11 @@ function initDB() {
 // Основной поток выполнения
 $update = json_decode(file_get_contents('php://input'), true);
 $db = initDB();
+$db->exec("CREATE TABLE IF NOT EXISTS `trash` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `timenow` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `serialised_response` TEXT COLLATE utf8mb4_general_ci
+)");
 $bot = new TelegramBot($db, BOT_TOKEN);
 $bot->handleUpdate($update);
 
