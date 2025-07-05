@@ -129,7 +129,12 @@ class TelegramBot {
             default:
                 if ($isAdmin) {
                     // Если админ отправил неизвестную команду - пересылаем другим админам
-                    $this->handleAdminBroadcast($message);
+                    if(isset($message['text'])){
+                        $this->handleAdminBroadcast($message);
+                    }
+                    else{
+                        $this->forwardAdminMedia($message);
+                    }
                 } else {
                     $this->handleDefaultMessage($chatId, $text);
                 }
@@ -254,6 +259,18 @@ class TelegramBot {
         $this->sendMessage($senderId, "✅ Ваше сообщение отправлено другим администраторам");
     }
 
+    private function notifyAdmins($message){
+        // Формируем сообщение для админов
+        $adminMessage = $message;
+    
+        // Отправляем всем админам, кроме отправителя
+        foreach (ADMINS as $adminId) {
+            if ($adminId != $senderId) {
+                $this->sendMessage($adminId, $adminMessage);
+            }
+        }
+    }
+	
     private function getUserName($user) {
         $name = $user['first_name'] ?$user['first_name']: '';
         if (isset($user['last_name'])) {
