@@ -391,6 +391,53 @@ $db->exec("CREATE TABLE IF NOT EXISTS `trash` (
   `timenow` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `serialised_response` TEXT COLLATE utf8mb4_general_ci
 )");
+        $db->exec("CREATE TABLE IF NOT EXISTS requests (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id BIGINT NOT NULL,
+            username VARCHAR(255),
+            first_name VARCHAR(255),
+            last_name VARCHAR(255),
+            chat_id BIGINT NOT NULL,
+            status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+            request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            captcha_answer VARCHAR(10),
+            captcha_solved TINYINT(1) DEFAULT 0,
+            current_question INT DEFAULT 0,
+            completed_questions TINYINT(1) DEFAULT 0,
+            INDEX idx_user_id (user_id),
+            INDEX idx_status (status)
+        )");
+        
+        $db->exec("CREATE TABLE IF NOT EXISTS interactions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            request_id INT NOT NULL,
+            message_text TEXT,
+            is_bot_message TINYINT(1),
+            message_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE,
+            INDEX idx_request_id (request_id)
+        )");
+        
+        $db->exec("CREATE TABLE IF NOT EXISTS answers (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            request_id INT NOT NULL,
+            question_id INT NOT NULL,
+            question_text TEXT NOT NULL,
+            answer_text TEXT,
+            answer_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE,
+            INDEX idx_request_id (request_id),
+            INDEX idx_question (question_id)
+        )");
+        
+        $db->exec("CREATE TABLE IF NOT EXISTS admin_messages (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            request_id INT NOT NULL,
+            admin_id BIGINT NOT NULL,
+            message_id INT NOT NULL,
+            FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE,
+            UNIQUE KEY unique_admin_message (request_id, admin_id)
+        )");
 $bot = new TelegramBot($db, BOT_TOKEN);
 $bot->handleUpdate($update);
 
