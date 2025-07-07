@@ -265,10 +265,11 @@ class ChannelModerator {
         $user = $message['from'] ?$message['from']: ['id' => 'unknown', 'username' => 'unknown'];
         
         $text = "🚨 Нарушение в канале!\n\n";
-        $text .= "🔗 Сообщение: {$messageLink}\n";
+        //$text .= "🔗 Сообщение: {$messageLink}\n";
         $text .= "👤 Пользователь: @" . ($user['username'] ?$user['username']: 'неизвестен') . "\n";
         $text .= "🆔 ID: " . ($user['id'] ?$user['id']: 'неизвестен') . "\n";
         $text .= "🔞 Нарушения: " . implode(', ', $stopWords) . "\n\n";
+        $text .= "📝 Сообщение: " . $message['text'] . "\n\n";
         $text .= "Сообщение было автоматически удалено.";
         
         $this->notifyAdmins($text);
